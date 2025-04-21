@@ -1,9 +1,24 @@
 // server/routes/movies.js
 const express = require('express');
 const Movie = require('../models/Movie');
+const { cacheMiddleware, clearCache } = require('../utils/cache');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
-router.get('/search', async (req, res) => {
+// Cache popular movies for 1 hour
+router.get('/popular', cacheMiddleware('movies'), async (req, res) => {
+  try {
+    const movies = await Movie.find()
+      .sort({ averageRating: -1 })
+      .limit(20);
+    res.json(movies);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Cache search results for 30 minutes
+router.get('/search', cacheMiddleware('movies', 1800), async (req, res) => {
   try {
     const { query, genre, yearFrom, yearTo, ratingFrom, sortBy } = req.query;
     
@@ -55,6 +70,57 @@ router.get('/search', async (req, res) => {
       .limit(50);
     
     res.json(movies);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add new movie (clear cache after)
+router.post('/', auth, async (req, res) => {
+  try {
+    const movie = new Movie(req.body);
+    await movie.save();
+    
+    // Clear relevant cache
+    await clearCache('movies:*');
+    
+    res.status(201).json(movie);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Update movie (clear cache after)
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const movie = await Movie.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    
+    if (!movie) return res.status(404).json({ message: 'Movie not found' });
+    
+    // Clear relevant cache
+    await clearCache('movies:*');
+    
+    res.json(movie);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete movie (clear cache after)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const movie = await Movie.findByIdAndDelete(req.params.id);
+    
+    if (!movie) return res.status(404).json({ message: 'Movie not found' });
+    
+    // Clear relevant cache
+    await clearCache('movies:*');
+    
+    res.json({ message: 'Movie deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
