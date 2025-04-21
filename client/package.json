@@ -55,7 +55,15 @@
       "\\.(css|less|scss|sass)$": "identity-obj-proxy",
       "^@/(.*)$": "<rootDir>/src/$1"
     },
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "collectCoverage": true,
+    "coverageReporters": ["json", "lcov", "text", "clover"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/setupTests.js",
+      "/src/reportWebVitals.js",
+      "/src/index.js"
+    ]
   },
   "devDependencies": {
     "identity-obj-proxy": "^3.0.0"
