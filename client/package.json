@@ -46,5 +46,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "testEnvironment": "jsdom"
+  },
+  "devDependencies": {
+    "identity-obj-proxy": "^3.0.0"
   }
 }
