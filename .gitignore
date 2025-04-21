@@ -1,0 +1,89 @@
+# .gitignore for Movie Review Platform
+
+# General
+.DS_Store
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+*.local
+/coverage
+
+# Backend (Node.js/Express)
+server/.env
+server/.env.*
+server/node_modules/
+server/coverage/
+server/.nyc_output/
+
+# Frontend (React)
+client/node_modules/
+client/.env.local
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+client/build/
+client/.cache/
+client/coverage/
+client/.eslintcache
+
+# Database
+*.db
+*.sqlite
+mongodata/
+
+# Testing
+/junit.xml
+/nyc_output/
+
+# Debug
+dump.rdb
+redis-data/
+
+# Build files
+*.exe
+*.out
+*.app
+
+# IDE specific
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# System Files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Documentation
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
