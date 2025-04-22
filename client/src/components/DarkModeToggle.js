@@ -1,4 +1,3 @@
-// client/src/components/DarkModeToggle.js
 import React, { useContext } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 import { FaMoon, FaSun } from 'react-icons/fa';
@@ -15,7 +14,7 @@ const DarkModeToggle = () => {
       {darkMode ? (
         <FaSun className="text-yellow-300 text-xl" />
       ) : (
-        <FaMoon className="text-gray-700 text-xl" />
+        <FaMoon className="text-gray-200 text-xl" />
       )}
     </button>
   );

@@ -1,6 +1,6 @@
-// client/src/context/AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
+import jwt_decode from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -13,6 +13,12 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
+          const decoded = jwt_decode(token);
+          if (decoded.exp * 1000 < Date.now()) {
+            logout();
+            return;
+          }
+          
           const response = await api.get('/auth/me');
           setUser(response.data);
         }
@@ -34,7 +40,10 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
-      return { success: false, message: error.response?.data?.message || 'Login failed' };
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Login failed' 
+      };
     }
   };
 
@@ -45,7 +54,10 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
-      return { success: false, message: error.response?.data?.message || 'Registration failed' };
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Registration failed' 
+      };
     }
   };
 

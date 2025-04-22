@@ -1,4 +1,3 @@
-// client/src/services/tmdb.js
 import axios from 'axios';
 
 const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -38,7 +37,7 @@ export const getMovieDetails = async (movieId) => {
   try {
     const response = await tmdb.get(`/movie/${movieId}`, {
       params: {
-        append_to_response: 'credits,videos,similar'
+        append_to_response: 'credits,videos,similar,reviews'
       }
     });
     return response.data;
