@@ -1,10 +1,10 @@
-// server/utils/cache.js
 const redis = require('redis');
 const { promisify } = require('util');
+const config = require('../config/db');
 
 const client = redis.createClient({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: process.env.REDIS_PORT || 6379
+  host: config.redisHost,
+  port: config.redisPort
 });
 
 client.on('error', (err) => {
@@ -15,7 +15,7 @@ const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
 const delAsync = promisify(client.del).bind(client);
 
-const cacheMiddleware = (keyPrefix, ttl = 3600) => {
+exports.cacheMiddleware = (keyPrefix, ttl = 3600) => {
   return async (req, res, next) => {
     if (process.env.NODE_ENV === 'test') return next();
     
@@ -23,27 +23,24 @@ const cacheMiddleware = (keyPrefix, ttl = 3600) => {
     
     try {
       const cachedData = await getAsync(cacheKey);
-      if (cachedData) {
-        return res.json(JSON.parse(cachedData));
-      }
+      if (cachedData) return res.json(JSON.parse(cachedData));
       
-      // Override res.json to cache the response
       const originalJson = res.json;
       res.json = (body) => {
         setAsync(cacheKey, JSON.stringify(body), 'EX', ttl)
-          .catch(err => console.error('Cache set error:', err));
+          .catch(console.error);
         return originalJson.call(res, body);
       };
       
       next();
     } catch (err) {
-      console.error('Cache middleware error:', err);
+      console.error('Cache error:', err);
       next();
     }
   };
 };
 
-const clearCache = async (keyPattern) => {
+exports.clearCache = async (keyPattern) => {
   if (process.env.NODE_ENV === 'test') return;
   
   try {
@@ -54,12 +51,8 @@ const clearCache = async (keyPattern) => {
       });
     });
     
-    if (keys.length > 0) {
-      await delAsync(keys);
-    }
+    if (keys.length > 0) await delAsync(keys);
   } catch (err) {
     console.error('Cache clear error:', err);
   }
 };
-
-module.exports = { cacheMiddleware, clearCache };

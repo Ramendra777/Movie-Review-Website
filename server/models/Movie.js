@@ -1,4 +1,3 @@
-// server/models/Movie.js
 const mongoose = require('mongoose');
 
 const MovieSchema = new mongoose.Schema({
@@ -11,21 +10,11 @@ const MovieSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  overview: {
-    type: String
-  },
-  posterPath: {
-    type: String
-  },
-  backdropPath: {
-    type: String
-  },
-  releaseDate: {
-    type: Date
-  },
-  genres: [{
-    type: String
-  }],
+  overview: String,
+  posterPath: String,
+  backdropPath: String,
+  releaseDate: Date,
+  genres: [String],
   averageRating: {
     type: Number,
     default: 0
@@ -37,11 +26,15 @@ const MovieSchema = new mongoose.Schema({
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
-});
+}, { timestamps: true });
+
+// Update average rating when new reviews are added
+MovieSchema.methods.updateRating = async function(reviewRating) {
+  const totalRatings = this.averageRating * this.ratingCount + reviewRating;
+  this.ratingCount += 1;
+  this.averageRating = totalRatings / this.ratingCount;
+  await this.save();
+};
 
 module.exports = mongoose.model('Movie', MovieSchema);

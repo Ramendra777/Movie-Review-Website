@@ -1,12 +1,16 @@
-const express = require('express');
-const app = express();
+const app = require('./app');
+const mongoose = require('mongoose');
+const config = require('./config/db');
 
-// ... your existing middleware and routes
+const PORT = process.env.PORT || 5000;
 
-app.get('/api', (req, res) => {
-  res.json({ status: 'API is running' });
-});
-
-// ... your existing server setup
-
-module.exports = app;
+mongoose.connect(config.mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true
+})
+.then(() => {
+  console.log('MongoDB connected');
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+})
+.catch(err => console.error('MongoDB connection error:', err));
